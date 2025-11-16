@@ -1,41 +1,29 @@
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>NEXai Wallet</title>
-<link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEXai Wallet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        background-color: #0D1117;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
 </head>
-<body>
-<h1>NEXai Wallet</h1>
-
-<label for="network">Select Network:</label>
-<select id="network">
-  <option value="testnet">Testnet</option>
-  <option value="mainnet">Mainnet</option>
-</select>
-
-<button id="generateKey">Generate New Wallet</button>
-<label for="privateKey">Or Import Private Key:</label>
-<input type="text" id="privateKey" placeholder="0x...">
-<button id="importKey">Import</button>
-
-<div id="walletInfo" style="display:none;">
-  <p><b>Address:</b> <span id="walletAddress"></span></p>
-  <p><b>Balance:</b> <span id="walletBalance"></span> NEXAI</p>
-
-  <button id="goOnline">Go Online</button>
-  <button id="goOffline">Go Offline</button>
-  <p><b>Node Status:</b> <span id="nodeStatus">Offline</span></p>
-  <p><b>Reward:</b> <span id="nodeReward">0</span> NEXAI</p>
-
-  <h3>Send NEXAI</h3>
-  <input type="text" id="recipient" placeholder="Recipient Address">
-  <input type="number" id="amount" placeholder="Amount">
-  <button id="sendToken">Send</button>
-  <p id="txStatus"></p>
-</div>
-
-<script src="utils.js"></script>
-<script src="wallet.js"></script>
-</body>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>

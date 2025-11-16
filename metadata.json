@@ -1,0 +1,5 @@
+{
+  "name": "NEXai Web3 Wallet",
+  "description": "A beautiful and functional Web3 wallet interface for the NEXai network. Allows users to generate new wallets, import existing ones, view balances, and send tokens.",
+  "requestFramePermissions": []
+}
