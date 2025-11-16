@@ -8,8 +8,9 @@ const App = () => {
   const [balance, setBalance] = useState("0");
   const [nodeOnline, setNodeOnline] = useState(false);
   const [reward, setReward] = useState("0");
+  const [recipient, setRecipient] = useState("");
+  const [amount, setAmount] = useState("");
 
-  // Load wallet from localStorage
   useEffect(() => {
     const savedKey = localStorage.getItem("nexaiPrivateKey");
     if (savedKey) {
@@ -47,47 +48,94 @@ const App = () => {
   };
 
   const sendToken = () => {
-    alert(`Sent token (Simulation).`);
+    alert(`Sent ${amount} NEXAI to ${recipient} (Simulation)`);
   };
 
   return (
-    <div className="bg-[#0D1117] p-6 rounded-xl shadow-lg w-full max-w-md animate-fade-in-up">
-      <h1 className="text-white text-2xl font-bold mb-4">NEXai Wallet</h1>
-      
-      <label className="block mb-2">Network:</label>
-      <select value={network} onChange={e => { setNetwork(e.target.value); updateBalance(e.target.value); }} className="w-full mb-4 p-2 rounded bg-[#161B22] text-white">
-        <option value="testnet">Testnet</option>
-        <option value="mainnet">Mainnet</option>
-      </select>
+    <div className="min-h-screen flex items-center justify-center bg-[#0D1117] p-4">
+      <div className="bg-[#161B22] p-6 rounded-xl shadow-lg w-full max-w-md animate-fade-in-up text-white">
+        <h1 className="text-2xl font-bold mb-4">NEXai Wallet</h1>
 
-      <div className="mb-4">
-        <button onClick={generateWallet} className="bg-green-600 text-white px-4 py-2 rounded mr-2">Generate Wallet</button>
-      </div>
+        <label className="block mb-2">Network:</label>
+        <select
+          value={network}
+          onChange={e => { setNetwork(e.target.value); updateBalance(e.target.value); }}
+          className="w-full mb-4 p-2 rounded bg-[#0D1117] text-white border border-gray-600"
+        >
+          <option value="testnet">Testnet</option>
+          <option value="mainnet">Mainnet</option>
+        </select>
 
-      <div className="mb-4">
-        <input type="text" value={privateKey} onChange={e => setPrivateKey(e.target.value)} placeholder="0x..." className="w-full p-2 rounded bg-[#161B22] text-white mb-2" />
-        <button onClick={importWallet} className="bg-blue-600 text-white px-4 py-2 rounded">Import Wallet</button>
-      </div>
+        <div className="mb-4 flex flex-col space-y-2">
+          <button
+            onClick={generateWallet}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+          >
+            Generate Wallet
+          </button>
 
-      {address && (
-        <div className="text-white mt-4 space-y-2">
-          <p><b>Address:</b> {address}</p>
-          <p><b>Balance:</b> {balance} NEXAI</p>
-          <p><b>Node Status:</b> {nodeOnline ? "Online" : "Offline"}</p>
-          <p><b>Reward:</b> {reward} NEXAI</p>
-
-          <div className="mt-2 space-x-2">
-            <button onClick={() => toggleNode(true)} className="bg-purple-600 px-3 py-1 rounded">Go Online</button>
-            <button onClick={() => toggleNode(false)} className="bg-gray-600 px-3 py-1 rounded">Go Offline</button>
-          </div>
-
-          <div className="mt-4">
-            <input type="text" placeholder="Recipient" className="w-full p-2 rounded bg-[#161B22] text-white mb-2" />
-            <input type="number" placeholder="Amount" className="w-full p-2 rounded bg-[#161B22] text-white mb-2" />
-            <button onClick={sendToken} className="bg-red-600 px-4 py-2 rounded w-full">Send</button>
-          </div>
+          <input
+            type="text"
+            value={privateKey}
+            onChange={e => setPrivateKey(e.target.value)}
+            placeholder="0x..."
+            className="w-full p-2 rounded bg-[#0D1117] text-white border border-gray-600"
+          />
+          <button
+            onClick={importWallet}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          >
+            Import Wallet
+          </button>
         </div>
-      )}
+
+        {address && (
+          <div className="mt-4 space-y-2">
+            <p><b>Address:</b> {address}</p>
+            <p><b>Balance:</b> {balance} NEXAI</p>
+            <p><b>Node Status:</b> {nodeOnline ? "Online" : "Offline"}</p>
+            <p><b>Reward:</b> {reward} NEXAI</p>
+
+            <div className="mt-2 flex space-x-2">
+              <button
+                onClick={() => toggleNode(true)}
+                className="bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded"
+              >
+                Go Online
+              </button>
+              <button
+                onClick={() => toggleNode(false)}
+                className="bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded"
+              >
+                Go Offline
+              </button>
+            </div>
+
+            <div className="mt-4 flex flex-col space-y-2">
+              <input
+                type="text"
+                placeholder="Recipient"
+                value={recipient}
+                onChange={e => setRecipient(e.target.value)}
+                className="w-full p-2 rounded bg-[#0D1117] text-white border border-gray-600"
+              />
+              <input
+                type="number"
+                placeholder="Amount"
+                value={amount}
+                onChange={e => setAmount(e.target.value)}
+                className="w-full p-2 rounded bg-[#0D1117] text-white border border-gray-600"
+              />
+              <button
+                onClick={sendToken}
+                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded w-full"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
