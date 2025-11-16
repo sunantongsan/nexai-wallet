@@ -5,13 +5,15 @@ const App = () => {
   const [network, setNetwork] = useState("testnet");
   const [privateKey, setPrivateKey] = useState("");
   const [address, setAddress] = useState("");
-  const [balance, setBalance] = useState(0); // ใช้ number
+  const [balance, setBalance] = useState(0);
   const [nodeOnline, setNodeOnline] = useState(false);
-  const [reward, setReward] = useState(0); // ใช้ number
+  const [reward, setReward] = useState(0);
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState(0);
+  const [showKeyModal, setShowKeyModal] = useState(false);
+  const [generatedKey, setGeneratedKey] = useState("");
 
-  // Load wallet จาก localStorage
+  // Load wallet + balance
   useEffect(() => {
     const savedKey = localStorage.getItem("nexaiPrivateKey");
     const savedBalance = localStorage.getItem("nexaiBalance");
@@ -23,21 +25,23 @@ const App = () => {
     }
   }, []);
 
+  // Generate Wallet
   const generateWallet = () => {
     const key = "0x" + crypto.getRandomValues(new Uint8Array(32))
       .reduce((s, b) => s + b.toString(16).padStart(2, "0"), "");
     setPrivateKey(key);
     setAddress("0x" + key.slice(-40));
-    setBalance(100000000000); // เริ่มด้วย 100B NEXAI
+    setBalance(100000000000);
     localStorage.setItem("nexaiPrivateKey", key);
     localStorage.setItem("nexaiBalance", "100000000000");
-    alert("🔐 Your Private Key:\n\n" + key + "\n\n⚠ Please store it safely!");
+    setGeneratedKey(key);
+    setShowKeyModal(true);
   };
 
   const copyKey = () => {
-    navigator.clipboard.writeText(privateKey)
-      .then(() => alert("Private Key copied to clipboard!"))
-      .catch(() => alert("Failed to copy!"));
+    navigator.clipboard.writeText(generatedKey)
+      .then(() => alert("Private Key copied!"))
+      .catch(() => alert("Copy failed!"));
   };
 
   const importWallet = () => {
@@ -58,28 +62,25 @@ const App = () => {
       alert("Invalid amount");
       return;
     }
-    setBalance(prev => {
-      const newBalance = prev - amount;
-      localStorage.setItem("nexaiBalance", newBalance.toString());
-      return newBalance;
-    });
+    const newBalance = balance - amount;
+    setBalance(newBalance);
+    localStorage.setItem("nexaiBalance", newBalance.toString());
     alert(`Sent ${amount} NEXAI to ${recipient}`);
     setRecipient("");
     setAmount(0);
   };
 
   const receiveToken = (incoming: number) => {
-    setBalance(prev => {
-      const newBalance = prev + incoming;
-      localStorage.setItem("nexaiBalance", newBalance.toString());
-      return newBalance;
-    });
+    if (incoming <= 0) return;
+    const newBalance = balance + incoming;
+    setBalance(newBalance);
+    localStorage.setItem("nexaiBalance", newBalance.toString());
     alert(`Received ${incoming} NEXAI`);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0D1117] p-4">
-      <div className="bg-[#161B22] p-6 rounded-xl shadow-lg w-full max-w-md animate-fade-in-up text-white">
+      <div className="bg-[#161B22] p-6 rounded-xl shadow-lg w-full max-w-md text-white">
         <h1 className="text-2xl font-bold mb-4">NEXai Wallet</h1>
 
         <label className="block mb-2">Network:</label>
@@ -95,18 +96,10 @@ const App = () => {
         <div className="mb-4 flex flex-col space-y-2">
           <button
             onClick={generateWallet}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+            className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
           >
             Generate Wallet
           </button>
-          {privateKey && (
-            <button
-              onClick={copyKey}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded"
-            >
-              Copy Private Key
-            </button>
-          )}
 
           <input
             type="text"
@@ -117,7 +110,7 @@ const App = () => {
           />
           <button
             onClick={importWallet}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
           >
             Import Wallet
           </button>
@@ -175,6 +168,30 @@ const App = () => {
               >
                 Receive
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Modal แสดง Private Key */}
+        {showKeyModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+            <div className="bg-[#161B22] p-6 rounded-xl w-full max-w-sm text-white">
+              <h2 className="text-xl font-bold mb-4">Your Private Key</h2>
+              <p className="break-all mb-4">{generatedKey}</p>
+              <div className="flex space-x-2">
+                <button
+                  onClick={copyKey}
+                  className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded flex-1"
+                >
+                  Copy Key
+                </button>
+                <button
+                  onClick={() => setShowKeyModal(false)}
+                  className="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded flex-1"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         )}
