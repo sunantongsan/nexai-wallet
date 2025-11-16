@@ -1,17 +1,11 @@
-const networks = {
-    testnet: {
-        rpc: "https://nexai-testnet-rpc.blockchainnode.dev",
-        chainId: 7070
-    },
-    mainnet: {
-        rpc: "https://nexai-mainnet-rpc.blockchainnode.dev",
-        chainId: 7071
-    }
-};
-
 let wallet = { address: "", privateKey: "" };
 let nodeOnline = false;
 let network = "testnet";
+
+// โหลด wallet จาก localStorage
+window.onload = function() {
+    loadWallet();
+}
 
 // Network select
 document.getElementById('network').addEventListener('change', (e)=>{
@@ -23,7 +17,8 @@ document.getElementById('network').addEventListener('change', (e)=>{
 document.getElementById('generateKey').addEventListener('click', ()=>{
     const key = "0x" + crypto.getRandomValues(new Uint8Array(32)).reduce((s,b)=>s+b.toString(16).padStart(2,'0'),'');
     wallet.privateKey = key;
-    wallet.address = "0x" + key.slice(-40); // Simple address for demo
+    wallet.address = "0x" + key.slice(-40);
+    saveWallet();
     showWallet();
 });
 
@@ -33,6 +28,7 @@ document.getElementById('importKey').addEventListener('click', ()=>{
     if(key.startsWith("0x") && key.length>=42){
         wallet.privateKey = key;
         wallet.address = "0x" + key.slice(-40);
+        saveWallet();
         showWallet();
     } else alert("Invalid Private Key");
 });
@@ -43,9 +39,21 @@ function showWallet(){
     updateBalance();
 }
 
+function saveWallet(){
+    localStorage.setItem('nexaiPrivateKey', wallet.privateKey);
+}
+
+function loadWallet(){
+    const savedKey = localStorage.getItem('nexaiPrivateKey');
+    if(savedKey){
+        wallet.privateKey = savedKey;
+        wallet.address = "0x" + savedKey.slice(-40);
+        showWallet();
+    }
+}
+
 // Mock balance & reward
 function updateBalance(){
-    // ใน Testnet: 100B initial
     document.getElementById('walletBalance').innerText = network==="testnet"? "100000000000" : "0";
     document.getElementById('nodeReward').innerText = "0";
 }
