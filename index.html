@@ -8,14 +8,12 @@
 <body>
 <h1>NEXai Wallet</h1>
 
-<!-- Select Network -->
 <label for="network">Select Network:</label>
 <select id="network">
   <option value="testnet">Testnet</option>
   <option value="mainnet">Mainnet</option>
 </select>
 
-<!-- Import / Generate Wallet -->
 <button id="generateKey">Generate New Wallet</button>
 <label for="privateKey">Or Import Private Key:</label>
 <input type="text" id="privateKey" placeholder="0x...">
@@ -25,13 +23,11 @@
   <p><b>Address:</b> <span id="walletAddress"></span></p>
   <p><b>Balance:</b> <span id="walletBalance"></span> NEXAI</p>
 
-  <!-- Online Node -->
   <button id="goOnline">Go Online</button>
   <button id="goOffline">Go Offline</button>
   <p><b>Node Status:</b> <span id="nodeStatus">Offline</span></p>
   <p><b>Reward:</b> <span id="nodeReward">0</span> NEXAI</p>
 
-  <!-- Send Tokens -->
   <h3>Send NEXAI</h3>
   <input type="text" id="recipient" placeholder="Recipient Address">
   <input type="number" id="amount" placeholder="Amount">
