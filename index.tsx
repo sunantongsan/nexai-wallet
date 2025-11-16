@@ -5,18 +5,21 @@ const App = () => {
   const [network, setNetwork] = useState("testnet");
   const [privateKey, setPrivateKey] = useState("");
   const [address, setAddress] = useState("");
-  const [balance, setBalance] = useState("0");
+  const [balance, setBalance] = useState(0); // ใช้ number
   const [nodeOnline, setNodeOnline] = useState(false);
-  const [reward, setReward] = useState("0");
+  const [reward, setReward] = useState(0); // ใช้ number
   const [recipient, setRecipient] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(0);
 
+  // Load wallet จาก localStorage
   useEffect(() => {
     const savedKey = localStorage.getItem("nexaiPrivateKey");
+    const savedBalance = localStorage.getItem("nexaiBalance");
     if (savedKey) {
       setPrivateKey(savedKey);
       setAddress("0x" + savedKey.slice(-40));
-      updateBalance(network);
+      setBalance(savedBalance ? parseInt(savedBalance) : 100000000000);
+      setReward(0);
     }
   }, []);
 
@@ -25,22 +28,25 @@ const App = () => {
       .reduce((s, b) => s + b.toString(16).padStart(2, "0"), "");
     setPrivateKey(key);
     setAddress("0x" + key.slice(-40));
+    setBalance(100000000000); // เริ่มด้วย 100B NEXAI
     localStorage.setItem("nexaiPrivateKey", key);
+    localStorage.setItem("nexaiBalance", "100000000000");
     alert("🔐 Your Private Key:\n\n" + key + "\n\n⚠ Please store it safely!");
-    updateBalance(network);
+  };
+
+  const copyKey = () => {
+    navigator.clipboard.writeText(privateKey)
+      .then(() => alert("Private Key copied to clipboard!"))
+      .catch(() => alert("Failed to copy!"));
   };
 
   const importWallet = () => {
     if (privateKey.startsWith("0x") && privateKey.length >= 66) {
       setAddress("0x" + privateKey.slice(-40));
+      const savedBalance = localStorage.getItem("nexaiBalance");
+      setBalance(savedBalance ? parseInt(savedBalance) : 0);
       localStorage.setItem("nexaiPrivateKey", privateKey);
-      updateBalance(network);
     } else alert("Invalid Private Key");
-  };
-
-  const updateBalance = (net: string) => {
-    setBalance(net === "testnet" ? "100000000000" : "0");
-    setReward("0");
   };
 
   const toggleNode = (online: boolean) => {
@@ -48,7 +54,27 @@ const App = () => {
   };
 
   const sendToken = () => {
-    alert(`Sent ${amount} NEXAI to ${recipient} (Simulation)`);
+    if (amount <= 0 || amount > balance) {
+      alert("Invalid amount");
+      return;
+    }
+    setBalance(prev => {
+      const newBalance = prev - amount;
+      localStorage.setItem("nexaiBalance", newBalance.toString());
+      return newBalance;
+    });
+    alert(`Sent ${amount} NEXAI to ${recipient}`);
+    setRecipient("");
+    setAmount(0);
+  };
+
+  const receiveToken = (incoming: number) => {
+    setBalance(prev => {
+      const newBalance = prev + incoming;
+      localStorage.setItem("nexaiBalance", newBalance.toString());
+      return newBalance;
+    });
+    alert(`Received ${incoming} NEXAI`);
   };
 
   return (
@@ -59,7 +85,7 @@ const App = () => {
         <label className="block mb-2">Network:</label>
         <select
           value={network}
-          onChange={e => { setNetwork(e.target.value); updateBalance(e.target.value); }}
+          onChange={e => setNetwork(e.target.value)}
           className="w-full mb-4 p-2 rounded bg-[#0D1117] text-white border border-gray-600"
         >
           <option value="testnet">Testnet</option>
@@ -73,6 +99,14 @@ const App = () => {
           >
             Generate Wallet
           </button>
+          {privateKey && (
+            <button
+              onClick={copyKey}
+              className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded"
+            >
+              Copy Private Key
+            </button>
+          )}
 
           <input
             type="text"
@@ -123,7 +157,7 @@ const App = () => {
                 type="number"
                 placeholder="Amount"
                 value={amount}
-                onChange={e => setAmount(e.target.value)}
+                onChange={e => setAmount(Number(e.target.value))}
                 className="w-full p-2 rounded bg-[#0D1117] text-white border border-gray-600"
               />
               <button
@@ -131,6 +165,15 @@ const App = () => {
                 className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded w-full"
               >
                 Send
+              </button>
+              <button
+                onClick={() => {
+                  const incoming = prompt("Enter amount received:") || "0";
+                  receiveToken(Number(incoming));
+                }}
+                className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded w-full"
+              >
+                Receive
               </button>
             </div>
           </div>
